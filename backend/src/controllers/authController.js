@@ -6,15 +6,15 @@ import { generateAccessToken, generateRefreshToken } from '../utils/generateToke
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function validateEmail(email) {
-    if (!email || typeof email !== 'String')
+    if (!email || typeof email !== 'string')
         return false
 
     const trimmed = email.trim().toLowerCase()
-    return EMAIL_REGEX.test(trimmed) && trimmed.length >= 100
+    return EMAIL_REGEX.test(trimmed) && trimmed.length <= 100
 }
 
 function validatePassword(password) {
-    if (!password || typeof password !== 'String')
+    if (!password || typeof password !== 'string')
         return false
 
     return password.length >= 8 && password.length <= 100
@@ -28,7 +28,7 @@ function sanitizeInput(input) {
 
 export async function registerUser(req, res) {
     try {
-        const { username, email, password, role, status } = req.body
+        const { username, email, password } = req.body
 
         // ✅ Check for missing fields before using them
         if (!email || !username || !password) {
@@ -62,8 +62,6 @@ export async function registerUser(req, res) {
             username: sanitizeUsername,
             email: sanitizeEmail,
             password: hashPassword,
-            role,
-            status
         })
 
         return res.status(201).json({

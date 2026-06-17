@@ -31,7 +31,10 @@ function RegisterPage() {
     e.preventDefault()
     setError('')
 
-    if (!formData) {
+    if (!formData.username ||
+        !formData.email ||
+        !formData.password ||
+        !formData.confirmPassword) {
       return toast.error("All fields are required")
     }
 
@@ -43,7 +46,7 @@ function RegisterPage() {
     }
 
     if (formData.password.length < 7) {
-      toast.error("Password must contain atleast 6 characters")
+      toast.error("Password must contain atleast 7 characters")
       return
     }
 
@@ -63,7 +66,7 @@ function RegisterPage() {
     setLoading(true)
 
     try {
-      await api.post("/auth/register")
+      await api.post("/auth/register", formData)
       toast.success("Registered Successfully")
       navigate("/login")
     } catch (error) {
