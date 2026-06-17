@@ -10,7 +10,7 @@ export const globalLimit = ratelimit({
 
 export const loginLimit = ratelimit({
     windowMs: 5 * 60 * 1000,
-    max: 10,
+    max: 100,
     message: "You reached a thereshold in logging in",
     standardHeaders: true,
     legacyHeaders: false,

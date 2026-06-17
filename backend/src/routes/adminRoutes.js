@@ -18,7 +18,7 @@ const router = express.Router()
 router.get("/pendings", 
     authenticate,
     verifyStatus,
-    authorize("admin"),
+    authorize("admin" || "superadmin"),
     checkPermission(Permission.VIEW_ALL_PENDING_POSTS),
     getAllPendingThought
 )
@@ -26,7 +26,7 @@ router.get("/pendings",
 router.get("/rejected", 
     authenticate,
     verifyStatus,
-    authorize("admin"),
+    authorize("admin" || "superadmin"),
     checkPermission(Permission.REJECT_POST),
     getAllRejectedThoughts
 )
@@ -34,7 +34,7 @@ router.get("/rejected",
 router.get("/:id", 
     authenticate,
     verifyStatus,
-    authorize("admin"),
+    authorize("admin" || "superadmin"),
     checkPermission(Permission.VIEW_PENDING_POST),
     getPendingThought
 )
@@ -42,7 +42,7 @@ router.get("/:id",
 router.delete("/thought/:id",
     authenticate,
     verifyStatus,
-    authorize("admin"),
+    authorize("admin" || "superadmin"),
     checkPermission(Permission.DELETE_ANY_POST),
     deleteBadThought
 )
@@ -50,7 +50,7 @@ router.delete("/thought/:id",
 router.delete("/comment/:id",
     authenticate,
     verifyStatus,
-    authorize("admin"),
+    authorize("admin" || "superadmin"),
     checkPermission(Permission.DELETE_ANY_COMMENT),
     deleteBadComment
 )
@@ -58,7 +58,7 @@ router.delete("/comment/:id",
 router.patch("/ban/:id",
     authenticate,
     verifyStatus,
-    authorize("admin"),
+    authorize("admin" || "superadmin"),
     checkPermission(Permission.BAN_USER),
     banUser
 )
@@ -66,7 +66,7 @@ router.patch("/ban/:id",
 router.patch("/restrict/:id",
     authenticate,
     verifyStatus,
-    authorize("admin"),
+    authorize("admin" || "superadmin"),
     checkPermission(Permission.RESTRICT_USER),
     restrictUser
 )
@@ -74,7 +74,7 @@ router.patch("/restrict/:id",
 router.patch("/approve/:id",
     authenticate,
     verifyStatus,
-    authorize("admin"),
+    authorize("admin" || "superadmin"),
     checkPermission(Permission.APPROVE_POST),
     approveThought
 )
@@ -82,7 +82,7 @@ router.patch("/approve/:id",
 router.patch("/reject/:id",
     authenticate,
     verifyStatus,
-    authorize("admin"),
+    authorize("admin" || "superadmin"),
     checkPermission(Permission.REJECT_POST),
     rejectThought
 )

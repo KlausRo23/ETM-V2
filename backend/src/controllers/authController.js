@@ -1,5 +1,6 @@
 import User from '../models/User.js'
 import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
 
 import { generateAccessToken, generateRefreshToken } from '../utils/generateToken.js'
 
@@ -143,5 +144,47 @@ export async function logout() {
     } catch (error) {
         console.error("Error logging out",error)
         return res.status(500).json({message: "Internal ERROR"})
+    }
+}
+
+export const refreshToken = async (req, res) => {
+    const token = req.cookies.refreshToken // adjust if your login controller sets a different cookie name
+
+    if (!token) {
+        return res.status(401).json({ success: false, message: 'No refresh token provided', data: null })
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET)
+
+        const user = await User.findById(decoded.id)
+
+        if (!user) {
+            return res.status(401).json({ success: false, message: 'User not found', data: null })
+        }
+
+        // if you're storing the refresh token on the user doc, uncomment to reject stale/rotated tokens
+        // if (user.refreshToken !== token) {
+        //     return res.status(401).json({ success: false, message: 'Refresh token mismatch', data: null })
+        // }
+
+        const accessToken = generateAccessToken(user)
+
+        return res.status(200).json({
+            success: true,
+            message: 'Access token refreshed',
+            data: {
+                accessToken,
+                user: {
+                    id: user._id,
+                    username: user.username,
+                    email: user.email,
+                    role: user.role
+                }
+            }
+        })
+    } catch (error) {
+        console.log('Refresh token invalid', error)
+        return res.status(401).json({ success: false, message: 'Invalid or expired refresh token', data: null })
     }
 }
