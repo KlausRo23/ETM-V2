@@ -128,6 +128,7 @@ export async function login(req, res) {
                 id: user._id,
                 username: user.username,
                 email: user.email,
+                role: user.role
             }
         })
 
@@ -137,7 +138,7 @@ export async function login(req, res) {
     }
 }
 
-export async function logout() {
+export async function logout(req, res) {
     try {
         res.clearCookie('refreshToken', {path: '/'})
         return res.status(200).json({message: "Logged out successfully"})
