@@ -1,0 +1,204 @@
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router'
+import { Eye, EyeOff } from 'lucide-react'
+import { useAuth } from "../context/AuthContext"
+import toast from 'react-hot-toast'
+import api from '../api/axios'
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+function RegisterPage() {
+
+
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  })
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const navigate = useNavigate()
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    setError('')
+
+    if (!formData) {
+      return toast.error("All fields are required")
+    }
+
+    if (formData.username.length < 2 || formData.username.length > 40) {
+        toast.error("UserName length must be atleast 2 characters or below 40",
+          {duration: 3000}
+        )
+          return
+    }
+
+    if (formData.password.length < 7) {
+      toast.error("Password must contain atleast 6 characters")
+      return
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Password don't match")
+      setError("Passwords don't match")
+      return
+    }
+
+    if (!EMAIL_REGEX.test(formData.email.trim())) {
+      toast.error("Please use a valid email",
+        {duration: 3000}
+      )
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      await api.post("/auth/register")
+      toast.success("Registered Successfully")
+      navigate("/login")
+    } catch (error) {
+      console.error("Failed to register user", error)
+      return toast.error("Failed to register")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className='etm-auth'>
+
+      {/* Left — Brand / Info panel */}
+      <div className='etm-board etm-auth__brand'>
+        <h1 className="etm-display etm-display--xl">
+          Each Thoughts Matter
+        </h1>
+        <p className="etm-body max-w-sm">
+          Pin a thought, anonymously. Read what others are carrying. Every voice gets a spot on the board.
+        </p>
+        <Link to='/' className='etm-btn--text mt-4'>
+          🡰 Back to Landing Page
+        </Link>
+      </div>
+
+      {/* Right — Register form */}
+      <div className='etm-auth__form-side'>
+        <form onSubmit={handleSubmit} className='etm-auth__form'>
+
+          <p className='etm-eyebrow etm-eyebrow--surface'>Get started</p>
+          <h2 className='etm-display etm-display--md mb-4' style={{ color: 'var(--etm-text-on-light)' }}>
+            Create your account
+          </h2>
+
+          {error && (
+            <p className='etm-meta mb-2' style={{ color: 'var(--etm-danger)' }}>
+              {error}
+            </p>
+          )}
+
+          <div className='etm-field'>
+            <label className='etm-label etm-label--surface' htmlFor='username'>Username</label>
+            <input
+              id='username'
+              name='username'
+              type='text'
+              value={formData.username}
+              onChange={handleChange}
+              placeholder='yourname'
+              className='etm-input etm-input--surface'
+              required
+            />
+          </div>
+
+          <div className='etm-field'>
+            <label className='etm-label etm-label--surface' htmlFor='email'>Email</label>
+            <input
+              id='email'
+              name='email'
+              type='email'
+              value={formData.email}
+              onChange={handleChange}
+              placeholder='you@example.com'
+              className='etm-input etm-input--surface'
+              required
+            />
+          </div>
+
+          <div className='etm-field'>
+            <label className='etm-label etm-label--surface' htmlFor='password'>Password</label>
+            <div className='etm-input-group'>
+              <input
+                id='password'
+                name='password'
+                type={showPassword ? 'text' : 'password'}
+                value={formData.password}
+                onChange={handleChange}
+                placeholder='••••••••'
+                className='etm-input etm-input--surface'
+                minLength={8}
+                required
+              />
+              <button
+                type='button'
+                onClick={() => setShowPassword(!showPassword)}
+                className='etm-input-toggle'
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
+
+          <div className='etm-field'>
+            <label className='etm-label etm-label--surface' htmlFor='confirmPassword'>Confirm Password</label>
+            <div className='etm-input-group'>
+              <input
+                id='confirmPassword'
+                name='confirmPassword'
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder='••••••••'
+                className='etm-input etm-input--surface'
+                minLength={8}
+                required
+              />
+              <button
+                type='button'
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className='etm-input-toggle'
+                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+              >
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
+
+          <button type='submit' className='etm-btn etm-btn--primary w-full justify-center mt-3'>
+            Sign Up
+          </button>
+
+          <p className='etm-meta etm-meta--surface text-center mt-4'>
+            Already have an account?{' '}
+            <Link to='/login' className='etm-link--surface'>
+              Log in
+            </Link>
+          </p>
+
+        </form>
+      </div>
+
+    </div>
+  )
+}
+
+export default RegisterPage

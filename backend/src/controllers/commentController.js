@@ -1,5 +1,5 @@
-import Comment from "../models/Comment";
-import Thought from "../models/Thought";
+import Comment from "../models/Comment.js";
+import Thought from "../models/Thought.js";
 
 function sanitizeInput(input) {
     if (typeof input !== 'string') return ''

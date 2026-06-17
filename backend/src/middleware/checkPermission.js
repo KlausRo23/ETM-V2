@@ -1,5 +1,5 @@
 // middleware/checkPermission.js
-import { hasPermission, isSuperAdmin } from "./rbac.utils.js"
+import { hasPermission, isSuperAdmin } from "../utils/rbac.utils.js"
 import { LOGCONSTANTS } from "../config/constants.js"
 import Log from "../models/Log.js"
 

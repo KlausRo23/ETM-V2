@@ -7,6 +7,7 @@ import { authenticate } from '../middleware/verifyToken.js'
 import verifyStatus, { canPost } from '../middleware/verifyStatus.js'
 import { checkPermission } from '../middleware/checkPermission.js'
 import { Permission } from "../middleware/permissions.js"
+import commentRouter from './commentRoutes.js'
 
 const router = express.Router()
 

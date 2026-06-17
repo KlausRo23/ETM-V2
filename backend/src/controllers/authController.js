@@ -26,40 +26,48 @@ function sanitizeInput(input) {
     return input.trim().slice(0, 1000)
 }
 
-export async function registerUser() {
+export async function registerUser(req, res) {
     try {
-        const {username, email, password, role, status} = req.body
+        const { username, email, password, role, status } = req.body
 
-        const checkEmail = await User.find({email})
-
-        if (checkEmail) {
-            return res.status(400).json({message: "User already exist"})
+        // ✅ Check for missing fields before using them
+        if (!email || !username || !password) {
+            return res.status(400).json({ message: "All fields are required" })
         }
 
-        const sanitizeUsername = sanitizeInput(username)
         const sanitizeEmail = email.trim().toLowerCase()
+        const sanitizeUsername = sanitizeInput(username)
 
+        // ✅ Validate after sanitizing, not before
         if (!validateEmail(sanitizeEmail)) {
-            return res.status(400).json({message: "Invalid Email"})
+            return res.status(400).json({ message: "Invalid Email" })
         }
 
         if (!validatePassword(password)) {
-            return res.status(400).json({message: "Invalid Password"})
+            return res.status(400).json({ message: "Invalid Password" })
         }
 
         if (sanitizeUsername.length <= 1 || sanitizeUsername.length >= 30) {
-            return res.status(400).json({message: "Invalid Username"})
+            return res.status(400).json({ message: "Invalid Username" })
         }
 
-        const hashPassword = await bcrypt.hash(password, 10) 
+        const checkEmail = await User.findOne({ email: sanitizeEmail })
+        if (checkEmail) {
+            return res.status(400).json({ message: "User already exist" })
+        }
+
+        const hashPassword = await bcrypt.hash(password, 10)
 
         const newUser = await User.create({
             username: sanitizeUsername,
             email: sanitizeEmail,
-            password: hashPassword
+            password: hashPassword,
+            role,
+            status
         })
 
-        return res.status(400).json({message: 'successfully created user',
+        return res.status(201).json({
+            message: 'successfully created user',
             user: {
                 id: newUser._id,
                 username: newUser.username,
@@ -68,7 +76,7 @@ export async function registerUser() {
         })
     } catch (error) {
         console.error("Failed to create user", error)
-        return res.status(500).json({message: "Internal Error"})
+        return res.status(500).json({ message: "Internal Error" })
     }
 }
 
