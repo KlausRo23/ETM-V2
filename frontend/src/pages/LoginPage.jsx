@@ -1,18 +1,61 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { Eye, EyeOff } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
+import toast from 'react-hot-toast'
+import api from '../api/axios'
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function LoginPage() {
   const [formData, setFormData] = useState({ email: '', password: '' })
   const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
+  const {login} = useAuth()
+
+  const navigate = useNavigate()
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = (e) => {
+  async function handleSubmit(e) {
     e.preventDefault()
-    // login logic goes here
+    setError("")
+    
+    setLoading(true)
+
+    if (!formData.email || !formData.password) {
+      return toast.error("All fields are required")
+    }
+
+      if (!EMAIL_REGEX.test(formData.email.trim())){
+      toast.error("Invalid credentials")
+      return
+    }
+
+    if (formData.password.length < 8) {
+      toast.error("Invalid credentials")
+      return
+    }
+
+    try {
+      const res = await api.post("/auth/login", formData)
+      login(res.data.user)
+      toast.success(`Welcome user`, {duration: 3000})
+      navigate("/home")
+    } catch (error) {
+      if (error.response?.status === 429) {
+        return toast.error("Slow down you are making many requests")
+      } else {
+        console.error("Failed to log in", error)
+        toast.error(error.response?.data?.message || 'Failed to login')
+        setError(error.response?.data?.message || 'Login failed. Please try again.')
+      }
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
