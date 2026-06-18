@@ -31,10 +31,10 @@ function RegisterPage() {
     e.preventDefault()
     setError('')
 
-    if (!formData.username ||
-        !formData.email ||
-        !formData.password ||
-        !formData.confirmPassword) {
+    if (!formData.username.trim() ||
+        !formData.email.trim() ||
+        !formData.password.trim() ||
+        !formData.confirmPassword.trim()) {
       return toast.error("All fields are required")
     }
 

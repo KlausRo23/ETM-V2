@@ -26,7 +26,7 @@ function LoginPage() {
     
     setLoading(true)
 
-    if (!formData.email || !formData.password) {
+    if (!formData.email.trim() || !formData.password.trim()) {
       return toast.error("All fields are required")
     }
 

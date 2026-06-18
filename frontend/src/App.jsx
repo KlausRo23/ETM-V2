@@ -6,6 +6,7 @@ import RegisterPage from './pages/RegisterPage'
 import ProtectedRoutes from './components/ProtectedRoutes'
 import DashBoard from './pages/DashBoard'
 import { Routes, Route } from 'react-router'
+import CreatePage from './pages/CreatePage'
 
 function App() {
   return (
@@ -22,6 +23,12 @@ function App() {
           <Route path='/home' element={
             <ProtectedRoutes>
               <DashBoard />
+            </ProtectedRoutes>
+          } />
+
+          <Route path='/create' element={
+            <ProtectedRoutes>
+              <CreatePage />
             </ProtectedRoutes>
           } />
         </Routes>

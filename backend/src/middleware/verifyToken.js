@@ -3,19 +3,21 @@ import User from '../models/User.js'
 
 export async function authenticate(req, res, next) {
   try {
-    const token = req.cookies.token
+    const authHeader = req.headers.authorization
 
-    if (!token || token === 'undefined' || token === 'null') {
-      console.log('[Auth] Empty or invalid token received')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.log('[Auth] Missing or malformed Authorization header')
       return res.status(401).json({
         success: false,
         message: 'Access token is missing or invalid',
       })
     }
 
+    const token = authHeader.split(' ')[1]
+
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
 
-    const user = await User.findById(decoded.userInfo._id).select('-password')
+    const user = await User.findById(decoded.id).select('-password')
 
     if (!user) {
       return res.status(401).json({
@@ -25,9 +27,9 @@ export async function authenticate(req, res, next) {
     }
 
     req.user = user
-    req.userId = decoded.userInfo._id
-    req.username = decoded.userInfo.username
-    req.role = decoded.userInfo.role  // ✅ singular, matches schema
+    req.userId = user._id
+    req.username = user.username
+    req.role = user.role
 
     next()
   } catch (error) {

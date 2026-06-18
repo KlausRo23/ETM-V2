@@ -8,8 +8,8 @@ function sanitizeTitle(title) {
 }
 
 function sanitizeContent(content) {
-    if (typeof content !== 'string')
-        return content.trim().slice(0, 5000)
+    if (typeof content !== 'string') return ''
+    return content.trim().slice(0, 5000)
 }
 //User can only see the approved post
 export async function getAllApprovedThoughts(req, res) {
@@ -47,24 +47,28 @@ export async function createThought(req, res) {
         const polishTitle = sanitizeTitle(title)
         const polishContent = sanitizeContent(content)
 
-        if (polishTitle.length < 1) {
-            return res.status(400).json({message: "Title cannot be empty"})
+        if (polishTitle.length < 1 || polishContent.length < 1) {
+            return res.status(400).json({ success: false, message: "Title and content cannot be empty" })
         }
 
-        if (polishContent > 100 || polishTitle > 5000) {
-            return res.status(400).json({message: "Invalid, please shorten the title to 100 characters or content to 5000"})
+        if (polishTitle.length > 100 || polishContent.length > 5000) {
+            return res.status(400).json({ success: false, message: "Please shorten the title to 100 characters or content to 5000" })
         }
 
         const thought = await new Thought({
-            author: req.user._Id,
+            author: req.user._id,
             title: polishTitle,
             content: polishContent
         }).save()
 
-        return res.status(201).json({message: "Created Successfully", thought: {title: thought.title}})
+        return res.status(201).json({
+            success: true,
+            message: "Created Successfully",
+            data: thought
+        })
     } catch (error) {
        console.error("Failed in creating title", error)
-       return res.status(500).json({message: error.message}) 
+       return res.status(500).json({ success: false, message: error.message }) 
     }
 }
 
