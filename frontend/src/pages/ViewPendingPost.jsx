@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react'
 import PostCard from '../components/PostCard'
 import toast from 'react-hot-toast'
 import api from '../api/axios'
+import { useAuth } from '../context/AuthContext'
 
 function ViewPendingPost() {
-  // TODO(Red): fetch from your admin endpoint, store here
+  const { loading: authLoading, isAuthenticated } = useAuth()
+
   const [thoughts, setThoughts] = useState([])
   const [loading, setLoading] = useState(false)
-
-  // TODO(Red): wire to your filter query (isApprove: 'pending' | 'approved' | 'rejected')
+  const [error, setError] = useState(null)
   const [statusFilter, setStatusFilter] = useState('all')
 
   const filters = [
@@ -18,30 +19,37 @@ function ViewPendingPost() {
     { key: 'rejected', label: 'Rejected' },
   ]
 
-  // TODO(Red): plug in your real filter logic here
-  const visibleThoughts =
-    statusFilter === 'all'
-      ? thoughts
-      : thoughts.filter((t) => t.isApprove === statusFilter)
+  const visibleThoughts = Array.isArray(thoughts)
+    ? (statusFilter === 'all' ? thoughts : thoughts.filter((t) => t.isApprove === statusFilter))
+    : []
 
-      useEffect(() => {
-        async function getPendingThought() {
-          setLoading(true)
+  useEffect(() => {
+    // wait for AuthContext to finish its /auth/refresh check first
+    if (authLoading) return
+    // no point hitting an admin endpoint with no session
+    if (!isAuthenticated) {
+      setLoading(false)
+      return
+    }
 
-          try {
-            const res = await api.get("/admin/pendings")
-            console.log("Full response:", res.data)
-            setThoughts(res.data.data || [])
-            console.log(res.data.data || [])
-          } catch (error) {
-            console.error("Failed to fetch data", error)
-            toast.error("Error in fetching")
-          } finally {
-            setLoading(false)
-          }
-        }
-        getPendingThought()
-      }, [])
+    async function getPendingThought() {
+      setLoading(true)
+      setError(null)
+
+      try {
+        const res = await api.get("/admin/pendings")
+        setThoughts(res.data.data || [])
+      } catch (err) {
+        console.error("Failed to fetch data", err)
+        setError("Failed to load submissions.")
+        toast.error("Error in fetching")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    getPendingThought()
+  }, [authLoading, isAuthenticated])
 
   return (
     <div className="etm-board etm-board--texture">
@@ -65,7 +73,6 @@ function ViewPendingPost() {
           </p>
         </div>
 
-        {/* TODO(Red): wire filter clicks to your actual fetch/filter logic */}
         <div style={{ display: 'flex', gap: 'var(--space-xs)', flexWrap: 'wrap', marginBottom: 'var(--space-lg)' }}>
           {filters.map((f) => (
             <button
@@ -83,7 +90,18 @@ function ViewPendingPost() {
           ))}
         </div>
 
-        {visibleThoughts.length === 0 ? (
+        {authLoading || loading ? (
+          <div className="etm-empty-state">
+            <p className="etm-body">Loading submissions...</p>
+          </div>
+        ) : error ? (
+          <div className="etm-empty-state">
+            <p className="etm-display etm-display--md">Something went wrong</p>
+            <p className="etm-body" style={{ color: 'var(--etm-text-muted)' }}>
+              {error}
+            </p>
+          </div>
+        ) : visibleThoughts.length === 0 ? (
           <div className="etm-empty-state">
             <p className="etm-display etm-display--md">Nothing here</p>
             <p className="etm-body" style={{ color: 'var(--etm-text-muted)' }}>
