@@ -1,23 +1,18 @@
-import React from 'react'
 import { Navigate } from 'react-router'
 import { useAuth } from '../context/AuthContext'
 
-function ProtectedRoutes({ children }) {
+export default function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen text-gray-400">
-        Loading...
+      <div className="etm-board etm-hero">
+        <p className="etm-loading-state">Loading...</p>
       </div>
     )
   }
 
-  if (!user) {
-    return <Navigate to="/login" replace />
-  }
+  if (!user) return <Navigate to="/login" replace />
 
   return children
 }
-
-export default ProtectedRoutes

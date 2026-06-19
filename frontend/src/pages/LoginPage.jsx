@@ -42,8 +42,8 @@ function LoginPage() {
 
     try {
       const res = await api.post("/auth/login", formData)
-      login(res.data.user)
-      toast.success(`Welcome user`, {duration: 3000})
+      login(res.data.user, res.data.accessToken)
+      toast.success(`Welcome user`, { duration: 3000 })
       navigate("/home")
     } catch (error) {
       if (error.response?.status === 429) {

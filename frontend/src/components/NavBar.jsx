@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { useAuth } from '../context/AuthContext'
 import toast from 'react-hot-toast'
@@ -5,6 +6,18 @@ import toast from 'react-hot-toast'
 function NavBar() {
   const { user, logout, loading } = useAuth()
   const navigate = useNavigate()
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const closeTimer = useRef(null)
+
+  function openDropdown() {
+    clearTimeout(closeTimer.current)
+    setDropdownOpen(true)
+  }
+
+  function closeDropdown() {
+    // small delay so mouse can travel from button → dropdown without it vanishing
+    closeTimer.current = setTimeout(() => setDropdownOpen(false), 150)
+  }
 
   async function handleLogout() {
     await logout()
@@ -72,25 +85,34 @@ function NavBar() {
             Create Post
           </Link>
 
-          <div className="relative group">
+          {/* Profile dropdown — controlled by React state + close delay */}
+          <div
+            className="relative"
+            onMouseEnter={openDropdown}
+            onMouseLeave={closeDropdown}
+          >
             <button className="w-10 h-10 rounded-full bg-gradient-to-br from-[#C9772E] to-[#A0522D] flex items-center justify-center text-sm font-semibold text-[#FBF5EC] hover:shadow-lg hover:shadow-[#C9772E]/40 transition-all duration-300 border border-[#C9772E]/40">
               {user?.username?.[0]?.toUpperCase() || 'U'}
             </button>
 
-            <div className="absolute right-0 top-full mt-2 hidden group-hover:flex flex-col bg-[rgba(245,237,225,0.95)] backdrop-blur-lg rounded-lg shadow-xl border border-[rgba(160,82,45,0.25)] min-w-[160px] z-10 overflow-hidden">
-              <Link
-                to={`/profile/${user?._id}`}
-                className="px-4 py-3 text-sm font-medium text-[#2A1A10] hover:bg-[#C9772E]/15 transition-colors duration-300 border-b border-[rgba(160,82,45,0.12)]"
-              >
-                Profile
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-3 text-sm font-medium text-left text-[#B23A2E] hover:bg-[#B23A2E]/12 transition-colors duration-300"
-              >
-                Logout
-              </button>
-            </div>
+            {dropdownOpen && (
+              <div className="absolute right-0 top-full pt-2 z-10 min-w-[160px]">
+                <div className="flex flex-col bg-[rgba(245,237,225,0.95)] backdrop-blur-lg rounded-lg shadow-xl border border-[rgba(160,82,45,0.25)] overflow-hidden">
+                  <Link
+                    to={`/profile/${user?._id}`}
+                    className="px-4 py-3 text-sm font-medium text-[#2A1A10] hover:bg-[#C9772E]/15 transition-colors duration-300 border-b border-[rgba(160,82,45,0.12)]"
+                  >
+                    Profile
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="px-4 py-3 text-sm font-medium text-left text-[#B23A2E] hover:bg-[#B23A2E]/12 transition-colors duration-300"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

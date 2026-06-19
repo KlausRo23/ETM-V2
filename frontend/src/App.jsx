@@ -7,6 +7,7 @@ import ProtectedRoutes from './components/ProtectedRoutes'
 import DashBoard from './pages/DashBoard'
 import { Routes, Route } from 'react-router'
 import CreatePage from './pages/CreatePage'
+import ViewPendingPost from './pages/ViewPendingPost'
 
 function App() {
   return (
@@ -23,12 +24,18 @@ function App() {
           <Route path='/home' element={
             <ProtectedRoutes>
               <DashBoard />
-            </ProtectedRoutes>
+            </ProtectedRoutes> 
           } />
 
           <Route path='/create' element={
             <ProtectedRoutes>
               <CreatePage />
+            </ProtectedRoutes>
+          } />
+
+          <Route path='/admin/submitted-posts' element={
+            <ProtectedRoutes>
+              <ViewPendingPost />
             </ProtectedRoutes>
           } />
         </Routes>
