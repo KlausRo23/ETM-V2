@@ -49,13 +49,6 @@ function NavBar() {
         </Link>
 
         <div className="hidden md:flex items-center gap-6">
-          <Link
-            to="/"
-            className="text-[#FBF5EC] hover:text-[#C9772E] text-sm font-medium transition-colors duration-300 relative group"
-          >
-            Feed
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#C9772E] group-hover:w-full transition-all duration-300"></span>
-          </Link>
 
           {(user?.role === 'admin' || user?.role === 'superadmin') && (
             <Link

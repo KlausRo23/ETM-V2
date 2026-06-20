@@ -3,6 +3,8 @@ import PostCard from '../components/PostCard'
 import toast from 'react-hot-toast'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
+import { ArrowBigLeft } from 'lucide-react'
+import { Link } from 'react-router'
 
 function ViewPendingPost() {
   const { loading: authLoading, isAuthenticated } = useAuth()
@@ -63,6 +65,10 @@ function ViewPendingPost() {
       </div>
 
       <div className="etm-board__content etm-container">
+
+        <Link to="/home">
+        <ArrowBigLeft />Back
+        </Link>
         <div style={{ marginBottom: 'var(--space-lg)' }}>
           <p className="etm-eyebrow">Admin · Moderation Queue</p>
           <h1 className="etm-display etm-display--lg" style={{ margin: '0.25rem 0 0.5rem' }}>
