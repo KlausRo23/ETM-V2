@@ -8,7 +8,7 @@ function sanitizeInput(input) {
 
 export async function getAllComments(req, res) {
     try {
-        const comments = await Comment.find({to: req.params.id }).populate('author', 'username').sort({createdAt: -1})
+        const comments = await Comment.find({to: req.params.thoughtId }).populate('author', 'username').sort({createdAt: -1})
         
         return res.status(200).json(comments)
     } catch (error) {
@@ -19,7 +19,7 @@ export async function getAllComments(req, res) {
 
 export async function postComment(req, res) {
     try {
-        const { content } = req.body
+        const { content, thoughtId } = req.body
 
         // 1. Validate
         if (!content) {
@@ -29,8 +29,15 @@ export async function postComment(req, res) {
             })
         }
 
+        if (!thoughtId) {
+            return res.status(400).json({
+                success: false,
+                message: "thoughtId is required"
+            })
+        }
+
         // 2. Sanitize
-        const validComment = sanitizeInput(content)  // ✅ fixed variable
+        const validComment = sanitizeInput(content)
 
         if (validComment.length < 1) {
             return res.status(400).json({
@@ -40,7 +47,7 @@ export async function postComment(req, res) {
         }
 
         // 3. Check if thought exists
-        const thought = await Thought.findById(req.params.id)
+        const thought = await Thought.findById(thoughtId)
         if (!thought) {
             return res.status(404).json({
                 success: false,
@@ -51,13 +58,13 @@ export async function postComment(req, res) {
         // 4. Create comment
         const comment = await Comment.create({
             content: validComment,
-            author: req.user._id,    // ✅ from verifyToken
-            to: req.params.id        // ✅ which thought
+            author: req.user._id,
+            to: thoughtId
         })
 
         // 5. Push to thought's comments array
         await Thought.findByIdAndUpdate(
-            req.params.id,
+            thoughtId,
             { $push: { comments: comment._id } }
         )
 
