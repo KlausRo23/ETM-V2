@@ -8,6 +8,7 @@ import DashBoard from './pages/DashBoard'
 import { Routes, Route } from 'react-router'
 import CreatePage from './pages/CreatePage'
 import ViewPendingPost from './pages/ViewPendingPost'
+import PostInfo from './pages/PostInfo'
 
 function App() {
   return (
@@ -36,6 +37,12 @@ function App() {
           <Route path='/admin/submitted-posts' element={
             <ProtectedRoutes>
               <ViewPendingPost />
+            </ProtectedRoutes>
+          } />
+
+          <Route path='/thought/:id' element={
+            <ProtectedRoutes>
+              <PostInfo />
             </ProtectedRoutes>
           } />
         </Routes>

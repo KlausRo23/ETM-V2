@@ -45,7 +45,7 @@ function NavBar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
 
         <Link to="/" className="text-2xl font-bold tracking-tight text-[#FBF5EC] hover:text-[#C9772E] transition-colors duration-300">
-          ETM
+          Each Thoughts Matter
         </Link>
 
         <div className="hidden md:flex items-center gap-6">

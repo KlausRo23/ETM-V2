@@ -42,7 +42,7 @@ function Dashboard() {
     <div>
       <header><NavBar /></header>
       <main className='px-20 py-10'>
-        <div className='flex overflow-y-auto w-full h-auto'>
+        <div className='flex overflow-y-auto w-full h-auto gap-4'>
           {thoughts.map((thought, index) => (
             <PostCard key={thought._id} thought={thought} index={index} setThoughts={setThoughts} />
           ))}
