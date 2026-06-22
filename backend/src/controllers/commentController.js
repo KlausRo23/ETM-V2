@@ -218,7 +218,7 @@ export async function unlikeComment(req, res) {
         return res.status(200).json({
             success: true,
             message: "Comment unliked",
-            data: { likes: thought.likedBy.length }
+            data: { likes: comment.likedBy.length }
         })
     } catch (error) {
         console.error("Failed to unlike post", error)

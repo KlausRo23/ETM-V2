@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router'
+import { Link, useParams } from 'react-router'
 import api from '../api/axios'
 import toast from 'react-hot-toast'
 import CommentCard from '../components/CommentCard'
+import { ArrowBigLeft } from 'lucide-react'
 
 function PostInfo() {
 
@@ -55,6 +56,10 @@ function PostInfo() {
 
   return (
     <div className="etm-board etm-board--texture">
+
+      <Link to="/home" className='absolute top-5 left-4 flex flex-row gap-3'>
+        <ArrowBigLeft />Back
+      </Link>
       <div className="etm-bg-notes">
         <div className="etm-bg-note etm-bg-note--1">pin it up</div>
         <div className="etm-bg-note etm-bg-note--2">be heard</div>
