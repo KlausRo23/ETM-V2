@@ -48,6 +48,8 @@ function LoginPage() {
     } catch (error) {
       if (error.response?.status === 429) {
         return toast.error("Slow down you are making many requests")
+      } else if (error.response?.status === 403) {
+        toast.error("You're account has been banned")
       } else {
         console.error("Failed to log in", error)
         toast.error(error.response?.data?.message || 'Failed to login')

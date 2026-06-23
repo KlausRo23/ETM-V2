@@ -12,7 +12,7 @@ function CommentCard({ thought, refreshKey }) {
   const [editingId, setEditingId] = useState(null)
   const [editText, setEditText] = useState('')
   const [likingId, setLikingId] = useState(null)
-  const menuRef = useRef(null)
+  const menuRefs = useRef({})
 
   useEffect(() => {
     async function getComments() {
@@ -32,13 +32,17 @@ function CommentCard({ thought, refreshKey }) {
 
   useEffect(() => {
     function handleClickOutside(e) {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
+      if (
+        openMenuId &&
+        menuRefs.current[openMenuId] &&
+        !menuRefs.current[openMenuId].contains(e.target)
+      ) {
         setOpenMenuId(null)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+  }, [openMenuId])
 
   function formatDate(dateStr) {
     if (!dateStr) return ''
@@ -89,7 +93,6 @@ function CommentCard({ thought, refreshKey }) {
     const wasLiked = comment.likedBy?.some(id => String(id) === String(user?.id))
     const prevComments = comments
 
-    // optimistic update
     setComments(prev =>
       prev.map(c => {
         if (c._id !== comment._id) return c
@@ -145,7 +148,10 @@ function CommentCard({ thought, refreshKey }) {
 
               {/* Three dot menu — owner only */}
               {isOwner && (
-                <div style={{ position: 'relative' }} ref={menuRef}>
+                <div
+                  style={{ position: 'relative' }}
+                  ref={el => menuRefs.current[comment._id] = el}
+                >
                   <button
                     onClick={() => setOpenMenuId(prev => prev === comment._id ? null : comment._id)}
                     style={{
@@ -153,7 +159,7 @@ function CommentCard({ thought, refreshKey }) {
                       border: 'none',
                       cursor: 'pointer',
                       fontSize: '1.1rem',
-                      color: 'var(--etm-text-muted)',
+                      color: 'var(--etm-rust)',
                       padding: '0 0.25rem',
                       lineHeight: 1,
                     }}
