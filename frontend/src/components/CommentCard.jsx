@@ -84,6 +84,18 @@ function CommentCard({ thought, refreshKey }) {
     }
   }
 
+  async function handleBanUser(authorId, username) {
+    try {
+      await api.patch(`/admin/ban/${authorId}`)
+      toast.success(`${username} has been banned`)
+    } catch (error) {
+      console.error("Failed to ban user", error)
+      toast.error("Failed to ban user")
+    } finally {
+      setOpenMenuId(null)
+    }
+  }
+
   async function handleLikeComment(e, comment) {
     e.preventDefault()
     e.stopPropagation()
@@ -130,7 +142,9 @@ function CommentCard({ thought, refreshKey }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
       {comments.map((comment) => {
         const isOwner = String(comment.author?._id) === String(user?.id)
+        const isAdmin = user?.role === 'admin' || user?.role === 'superadmin'
         const isLiked = comment.likedBy?.some(id => String(id) === String(user?.id))
+        const canSeeMenu = isOwner || isAdmin
 
         return (
           <div key={comment._id} className="etm-card" style={{ position: 'relative' }}>
@@ -146,8 +160,8 @@ function CommentCard({ thought, refreshKey }) {
                 </span>
               </div>
 
-              {/* Three dot menu — owner only */}
-              {isOwner && (
+              {/* Three dot menu — owner or admin */}
+              {canSeeMenu && (
                 <div
                   style={{ position: 'relative' }}
                   ref={el => menuRefs.current[comment._id] = el}
@@ -177,29 +191,35 @@ function CommentCard({ thought, refreshKey }) {
                       borderRadius: '0.5rem',
                       boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
                       zIndex: 10,
-                      minWidth: '120px',
+                      minWidth: '130px',
                       overflow: 'hidden',
                     }}>
-                      <button
-                        onClick={() => {
-                          setEditingId(comment._id)
-                          setEditText(comment.content)
-                          setOpenMenuId(null)
-                        }}
-                        style={{
-                          display: 'block',
-                          width: '100%',
-                          padding: '0.6rem 1rem',
-                          textAlign: 'left',
-                          background: 'none',
-                          border: 'none',
-                          cursor: 'pointer',
-                          fontSize: '0.85rem',
-                          color: 'var(--etm-text-on-light)',
-                        }}
-                      >
-                        Edit
-                      </button>
+
+                      {/* Edit — owner only */}
+                      {isOwner && (
+                        <button
+                          onClick={() => {
+                            setEditingId(comment._id)
+                            setEditText(comment.content)
+                            setOpenMenuId(null)
+                          }}
+                          style={{
+                            display: 'block',
+                            width: '100%',
+                            padding: '0.6rem 1rem',
+                            textAlign: 'left',
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '0.85rem',
+                            color: 'var(--etm-text-on-light)',
+                          }}
+                        >
+                          Edit
+                        </button>
+                      )}
+
+                      {/* Delete — owner or admin */}
                       <button
                         onClick={() => handleDelete(comment._id)}
                         style={{
@@ -216,6 +236,26 @@ function CommentCard({ thought, refreshKey }) {
                       >
                         Delete
                       </button>
+
+                      {/* Ban User — admin only, can't ban yourself */}
+                      {isAdmin && !isOwner && (
+                        <button
+                          onClick={() => handleBanUser(comment.author?._id, comment.author?.username)}
+                          style={{
+                            display: 'block',
+                            width: '100%',
+                            padding: '0.6rem 1rem',
+                            textAlign: 'left',
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '0.85rem',
+                            color: 'var(--etm-danger)',
+                          }}
+                        >
+                          Ban User
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
