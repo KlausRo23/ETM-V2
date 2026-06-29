@@ -136,25 +136,26 @@ export async function deleteComment(req, res) {
         const comment = await Comment.findById(req.params.id)
 
         if (!comment) {
-            return res.status(404).json({success: false, message: "Comment not found"})
+            return res.status(404).json({ success: false, message: "Comment not found" })
         }
 
         const isOwner = comment.author.toString() === req.user._id.toString()
+        const isAdmin = req.user.role === "admin" || req.user.role === "superadmin"
 
-        if (!isOwner) {
-            return res.status(403).json({success: false, message: "You can delete your own comment only"})
+        if (!isOwner && !isAdmin) {
+            return res.status(403).json({ success: false, message: "You can only delete your own comment" })
         }
 
-        
         await Comment.findByIdAndDelete(req.params.id)
         await Thought.findByIdAndUpdate(
-            comment.to,                              // 👈 the thought this comment belongs to
-            { $pull: { comments: comment._id } }     // 👈 remove ID from array
+            comment.to,
+            { $pull: { comments: comment._id } }
         )
-        return res.status(200).json({success: true, message: "Successfully deleted a comment"})
+
+        return res.status(200).json({ success: true, message: "Successfully deleted a comment" })
     } catch (error) {
         console.error("Failed to delete comment", error)
-        return res.status(500).json({success: false, message: error.message})
+        return res.status(500).json({ success: false, message: error.message })
     }
 }
 
