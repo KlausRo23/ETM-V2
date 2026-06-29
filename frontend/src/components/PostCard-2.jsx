@@ -4,6 +4,8 @@ import api from '../api/axios'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
 import { Link } from 'react-router'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
 
 function PostCard2({ thought, index, setThoughts }) {
   const { user } = useAuth()
@@ -13,6 +15,8 @@ function PostCard2({ thought, index, setThoughts }) {
 
   const isLiked = thought.likedBy?.some(id => String(id) === String(user?.id))
 
+  dayjs.extend(relativeTime)
+  
   async function handleLikeClick(e) {
     e.preventDefault()
     e.stopPropagation()
@@ -68,8 +72,8 @@ function PostCard2({ thought, index, setThoughts }) {
           className="etm-card__footer"
           style={{ borderTop: 'none', paddingTop: 0, marginBottom: 'var(--space-sm)' }}
         >
-          <span className="etm-meta">
-            {thought.author?.username} · {thought.createdAt}
+          <span className="etm-meta" style={{color: 'var(--etm-rust)' }}>
+            {thought.author?.username} · {dayjs(thought.createdAt).fromNow()}
           </span>
         </div>
 

@@ -10,7 +10,7 @@ const verifyStatus = (req, res, next) => {
         }
 
         // 1. Full ban — block everything
-        if (req.user.isBan === "banned") {
+        if (req.user.status === "banned") {
             return res.status(403).json({
                 success: false,
                 message: "Your account has been banned"
@@ -18,7 +18,7 @@ const verifyStatus = (req, res, next) => {
         }
 
         // 2. Restricted — attach permission flags to req
-        if (req.user.isBan === "restricted") {
+        if (req.user.status === "restricted") {
             req.userPermissions = {
                 canPost:    false,
                 canComment: false,

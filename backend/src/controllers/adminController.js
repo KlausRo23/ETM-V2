@@ -92,12 +92,12 @@ export async function banUser(req, res) {
         }
         await User.findByIdAndUpdate(
             req.params.id,
-            {isBan: "banned"},
+            {status: "banned"},
             {new: true}
         )
 
         await Log.create({
-            action: LOGCONSTANTS.actions.user.BAN_USER,
+            action: LOGCONSTANTS.actions.user.BAN,
             category: LOGCONSTANTS.categories.USER_MANAGEMENT,
             title: "User was banned By Admin",
             description: `Admin banned user "${user.username}"`,
@@ -132,7 +132,7 @@ export async function restrictUser(req, res) {
         }
         await User.findByIdAndUpdate(
             req.params.id,
-            {isBan: "restricted"},
+            {status: "restricted"},
             {new: true}
         )
 

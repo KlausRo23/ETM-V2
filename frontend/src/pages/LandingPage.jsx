@@ -28,7 +28,7 @@ function LandingPage() {
         <div className='flex flex-col md:flex-row gap-3 w-full mt-2'>
           <Link to='/login' className='w-full'>
             <button className='etm-btn etm-btn--primary w-full justify-center'>
-              Sign in
+              Log in
             </button>
           </Link>
 
