@@ -101,7 +101,7 @@ export async function login(req, res) {
         const isCorrect = await bcrypt.compare(password, user.password)
 
         if (!isCorrect) {
-            return res.status(401).json({message: "Invalid Credential"})
+            return res.status(401).json({message: "Wrong ceredentials"})
         }
 
         if (user.status === "banned") {
@@ -185,7 +185,7 @@ export const refreshToken = async (req, res) => {
             }
         })
     } catch (error) {
-        console.log('Refresh token invalid', error)
+        console.error('Refresh token invalid', error)
         return res.status(401).json({ success: false, message: 'Invalid or expired refresh token', data: null })
     }
 }
